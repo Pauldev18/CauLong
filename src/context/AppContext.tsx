@@ -75,7 +75,7 @@ const initialState: AppState = {
       userId: '3',
       userName: 'Trần Thị B',
       amount: 50000,
-      reason: 'Chưa đóng quỹ tháng - Sân ABC (15/01/2025)',
+      reason: 'Chưa đóng tiền - Sân ABC (15/01/2025)',
       paid: false,
       scheduleId: '1',
     },

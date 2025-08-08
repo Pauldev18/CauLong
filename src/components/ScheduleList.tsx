@@ -185,7 +185,7 @@ export default function ScheduleList() {
               userId: user.id,
               userName: user.name,
               amount: 50000,
-              reason: `Chưa đóng quỹ tháng - ${schedule.courtName} (${new Date(schedule.playDate).toLocaleDateString('vi-VN')})`,
+              reason: `Chưa đóng tiền - ${schedule.courtName} (${new Date(schedule.playDate).toLocaleDateString('vi-VN')})`,
               paid: false,
               scheduleId: scheduleId,
             };
@@ -493,11 +493,43 @@ export default function ScheduleList() {
                                 })()}
                               </span>
                             )}
-                            {schedule.completed && vote.attending && (
-                              (() => {
-                                const isGuest = vote.userId.startsWith('guest-');
-                                
-                                if (isGuest) {
+                          {schedule.completed && vote.attending && (
+                            (() => {
+                              const isGuest = vote.userId.startsWith('guest-');
+                              if (isGuest) {
+                                const payment = getPaymentStatus(schedule.id, vote.userId);
+                                return (
+                                  <span className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${
+                                    payment?.paid 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {payment?.paid ? (
+                                      <>
+                                        <CheckCircle className="w-3 h-3" />
+                                        <span className="hidden sm:inline">Đã thanh toán</span>
+                                        <span className="sm:hidden">Đã trả</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <AlertCircle className="w-3 h-3" />
+                                        <span className="hidden sm:inline">Chưa thanh toán</span>
+                                        <span className="sm:hidden">Chưa trả</span>
+                                      </>
+                                    )}
+                                  </span>
+                                );
+                              } else {
+                                const user = users.find(u => u.id === vote.userId);
+                                if (user?.monthlyFeePaid) {
+                                  return (
+                                    <span className="text-xs px-2 py-1 rounded-full flex items-center gap-1 bg-green-100 text-green-800">
+                                      <CheckCircle className="w-3 h-3" />
+                                      <span className="hidden sm:inline">Đã thanh toán</span>
+                                      <span className="sm:hidden">Đã trả</span>
+                                    </span>
+                                  );
+                                } else if (user) {
                                   const payment = getPaymentStatus(schedule.id, vote.userId);
                                   return (
                                     <span className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${
@@ -520,46 +552,12 @@ export default function ScheduleList() {
                                       )}
                                     </span>
                                   );
-                                } else {
-                                  const user = users.find(u => u.id === vote.userId);
-                                  
-                                  if (user?.monthlyFeePaid) {
-                                    return (
-                                      <span className="text-xs px-2 py-1 rounded-full flex items-center gap-1 bg-green-100 text-green-800">
-                                        <CheckCircle className="w-3 h-3" />
-                                        <span className="hidden sm:inline">Đã thanh toán</span>
-                                        <span className="sm:hidden">Đã trả</span>
-                                      </span>
-                                    );
-                                  } else if (user) {
-                                    const payment = getPaymentStatus(schedule.id, vote.userId);
-                                    return (
-                                      <span className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${
-                                        payment?.paid 
-                                          ? 'bg-green-100 text-green-800' 
-                                          : 'bg-red-100 text-red-800'
-                                      }`}>
-                                        {payment?.paid ? (
-                                          <>
-                                            <CheckCircle className="w-3 h-3" />
-                                            <span className="hidden sm:inline">Đã thanh toán</span>
-                                            <span className="sm:hidden">Đã trả</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <AlertCircle className="w-3 h-3" />
-                                            <span className="hidden sm:inline">Chưa thanh toán</span>
-                                            <span className="sm:hidden">Chưa trả</span>
-                                          </>
-                                        )}
-                                      </span>
-                                    );
-                                  }
                                 }
-                                return null;
-                              })()
-                            )}
-                          </div>
+                              }
+                              return null;
+                            })()
+                          )}
+                                                    </div>
                         </div>
                         <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                           <span className={`flex items-center text-xs px-2 py-1 rounded-full ${
